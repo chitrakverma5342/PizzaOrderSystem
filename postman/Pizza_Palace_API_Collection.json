@@ -1,0 +1,724 @@
+{
+  "info": {
+    "_postman_id": "pizza-palace-api-collection-v21",
+    "name": "Pizza Palace — Automated REST API Test Suite",
+    "description": "Comprehensive Postman collection for the Pizza Ordering System STLC Project. Tests health, menu catalog, coupon validation, order checkout with variable chaining, and customer support endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Health & System",
+      "item": [
+        {
+          "name": "GET /api/health — System Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time is within SLA (< 500ms)', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                  "});",
+                  "",
+                  "pm.test('Response contains status: ok and valid ISO timestamp', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql('ok');",
+                  "    pm.expect(json.timestamp).to.be.a('string');",
+                  "    pm.expect(Date.parse(json.timestamp)).to.not.be.NaN;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Menu Catalog",
+      "item": [
+        {
+          "name": "GET /api/menu — Fetch Full Menu Catalog",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success: true and contains 10 items', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json.data.length).to.eql(10);",
+                  "});",
+                  "",
+                  "pm.test('Each menu item has required schema properties', function () {",
+                  "    var items = pm.response.json().data;",
+                  "    items.forEach(function (item) {",
+                  "        pm.expect(item).to.have.property('id').that.is.a('number');",
+                  "        pm.expect(item).to.have.property('name').that.is.a('string');",
+                  "        pm.expect(item).to.have.property('description').that.is.a('string');",
+                  "        pm.expect(item).to.have.property('price').that.is.a('number');",
+                  "        pm.expect(item).to.have.property('category').that.is.oneOf(['pizza', 'sides', 'drinks']);",
+                  "        pm.expect(item).to.have.property('image_url').that.is.a('string');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menu"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/menu?category=pizza — Filter by Category (Pizzas)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Filters to exactly 5 pizza items', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data.length).to.eql(5);",
+                  "    json.data.forEach(function (item) {",
+                  "        pm.expect(item.category).to.eql('pizza');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu?category=pizza",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menu"],
+              "query": [
+                { "key": "category", "value": "pizza" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/menu/:id — Fetch Single Item by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns Margherita item with correct price $8.99', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data.id).to.eql(1);",
+                  "    pm.expect(json.data.name).to.eql('Margherita');",
+                  "    pm.expect(json.data.price).to.eql(8.99);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menu", "1"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/menu/:id — 404 on Non-Existent Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 Not Found', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Returns success: false with error message', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.false;",
+                  "    pm.expect(json.error).to.eql('Menu item not found');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/9999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menu", "9999"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Coupon Engine",
+      "item": [
+        {
+          "name": "POST /api/coupons/validate — Valid Promo (WELCOME10)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Validates WELCOME10 with 10% discount', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data.valid).to.be.true;",
+                  "    pm.expect(json.data.discount_percent).to.eql(10);",
+                  "    pm.expect(json.data.description).to.eql('10% off your first order');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"WELCOME10\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/coupons/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coupons", "validate"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/coupons/validate — Valid Promo (STUDENT15)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Validates STUDENT15 with 15% discount', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data.valid).to.be.true;",
+                  "    pm.expect(json.data.discount_percent).to.eql(15);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"student15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/coupons/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coupons", "validate"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/coupons/validate — Unregistered Coupon (FAKE99)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns valid: false for unknown coupon code', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data.valid).to.be.false;",
+                  "    pm.expect(json.data.discount_percent).to.eql(0);",
+                  "    pm.expect(json.data.description).to.eql('Coupon not found');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"FAKE99\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/coupons/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coupons", "validate"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/coupons/validate — Missing Code Field (400 Bad Request)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Returns error indicating code is required', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.false;",
+                  "    pm.expect(json.error).to.eql('Coupon code is required');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/coupons/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coupons", "validate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Orders & Checkout",
+      "item": [
+        {
+          "name": "POST /api/orders — Place Valid Order (With Coupon & Variable Chaining)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "var json = pm.response.json();",
+                  "pm.test('Order created with accurate discount & totals', function () {",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.have.property('id');",
+                  "    pm.expect(json.data.customer_name).to.eql('Alex Morgan');",
+                  "    pm.expect(json.data.customer_email).to.eql('student@univ.edu');",
+                  "    pm.expect(json.data.status).to.eql('pending');",
+                  "    // 10.99 (Pepperoni) + 4.49 (Garlic Bread) = 15.48 subtotal",
+                  "    pm.expect(json.data.total_price).to.eql(15.48);",
+                  "    // 10% discount on 15.48 = 1.55",
+                  "    pm.expect(json.data.discount).to.eql(1.55);",
+                  "    // 15.48 - 1.55 = 13.93 final",
+                  "    pm.expect(json.data.final_price).to.eql(13.93);",
+                  "});",
+                  "",
+                  "// Variable Chaining: Save created order ID for subsequent GET & PATCH tests",
+                  "pm.environment.set('createdOrderId', json.data.id);",
+                  "console.log('Saved createdOrderId to environment:', json.data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customer_name\": \"Alex Morgan\",\n    \"customer_email\": \"student@univ.edu\",\n    \"phone\": \"+1 (555) 234-5678\",\n    \"address\": \"742 Evergreen Terrace, Apt 4B\",\n    \"items\": [\n        { \"id\": 2, \"name\": \"Pepperoni\", \"price\": 10.99, \"quantity\": 1 },\n        { \"id\": 6, \"name\": \"Garlic Bread\", \"price\": 4.49, \"quantity\": 1 }\n    ],\n    \"coupon_code\": \"WELCOME10\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/orders — Missing Customer Fields (400 Bad Request)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Returns validation error message', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.false;",
+                  "    pm.expect(json.error).to.include('customer_name, phone, and address are required');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customer_name\": \"\",\n    \"phone\": \"\",\n    \"address\": \"\",\n    \"items\": [{ \"id\": 1, \"name\": \"Margherita\", \"price\": 8.99, \"quantity\": 1 }]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/orders — Empty Items Array (400 Bad Request)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Returns error for empty items array', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.false;",
+                  "    pm.expect(json.error).to.eql('items must be a non-empty array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"customer_name\": \"Alex Morgan\",\n    \"phone\": \"+1 555 234-5678\",\n    \"address\": \"742 Evergreen Terrace\",\n    \"items\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/orders — List All Placed Orders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns array of orders with parsed items', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json.data.length).to.be.above(0);",
+                  "    pm.expect(json.data[0].items).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/orders?email={{testEmail}} — Filter by Customer Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns only orders matching testEmail', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    json.data.forEach(function (order) {",
+                  "        pm.expect(order.customer_email).to.eql(pm.environment.get('testEmail'));",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders?email={{testEmail}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"],
+              "query": [
+                { "key": "email", "value": "{{testEmail}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/orders/{{createdOrderId}} — Retrieve Chained Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns single order matching createdOrderId', function () {",
+                  "    var json = pm.response.json();",
+                  "    var expectedId = Number(pm.environment.get('createdOrderId'));",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data.id).to.eql(expectedId);",
+                  "    pm.expect(json.data.customer_name).to.eql('Alex Morgan');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{createdOrderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "{{createdOrderId}}"]
+            }
+          }
+        },
+        {
+          "name": "PATCH /api/orders/{{createdOrderId}}/status — Update to 'confirmed'",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Status successfully transitioned to confirmed', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data.status).to.eql('confirmed');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"confirmed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{createdOrderId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "{{createdOrderId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "PATCH /api/orders/{{createdOrderId}}/status — Reject Invalid Status (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Returns status constraint error message', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.false;",
+                  "    pm.expect(json.error).to.include('status must be one of: pending, confirmed, delivered');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"cancelled\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{createdOrderId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "{{createdOrderId}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Customer Support",
+      "item": [
+        {
+          "name": "POST /api/support — Submit Support Inquiry",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns generated ticket_id and SLA confirmation', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
+                  "    pm.expect(json.data.ticket_id).to.match(/^TICK-\\d{6}$/);",
+                  "    pm.expect(json.data.name).to.eql('Alex Morgan');",
+                  "    pm.expect(json.data.email).to.eql('student@univ.edu');",
+                  "    pm.expect(json.data.response_estimate).to.eql('Within 15 minutes');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Alex Morgan\",\n    \"email\": \"student@univ.edu\",\n    \"subject\": \"Order Tracking & Status\",\n    \"message\": \"Please let me know when my pizza will leave the kitchen!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/support",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "support"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/support — Missing Required Message (400 Bad Request)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Returns error requiring all fields', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.false;",
+                  "    pm.expect(json.error).to.eql('name, email, subject, and message are required');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Alex Morgan\",\n    \"email\": \"student@univ.edu\",\n    \"subject\": \"General Feedback\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/support",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "support"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

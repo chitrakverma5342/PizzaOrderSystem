@@ -1,0 +1,27 @@
+{
+  "id": "pizza-palace-local-env",
+  "name": "Pizza Palace Local Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "testEmail",
+      "value": "student@univ.edu",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "createdOrderId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2026-10-08T07:37:00.000Z",
+  "_postman_exported_using": "Postman/10.0.0"
+}

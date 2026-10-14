@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍕 Pizza Palace — Woodfire Artisanal Pizza</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="theme-brown">
+
+    <!-- ========================================================= -->
+    <!-- SCREEN 1: LOGIN PAGE                                      -->
+    <!-- ========================================================= -->
+    <section id="screen-login" class="auth-screen screen-active" data-testid="screen-login">
+        <div class="auth-overlay"></div>
+        <div class="auth-card" data-testid="login-card">
+            <div class="auth-header">
+                <span class="auth-badge">Woodfire Pizzeria</span>
+                <h1 class="auth-title">Pizza Palace</h1>
+                <p class="auth-subtitle">Sign in to craft your artisanal order</p>
+            </div>
+
+            <form id="login-form" data-testid="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" required placeholder="student@univ.edu" data-testid="login-email-input" value="student@univ.edu">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" data-testid="login-password-input" value="pizza123">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" data-testid="login-submit-btn">
+                    Sign In & Continue →
+                </button>
+            </form>
+
+            <div class="auth-footer-demo">
+                <span class="demo-tag">Testing Mode</span>
+                <p>Click Sign In to proceed with sample student credentials or enter custom details.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- SCREEN 2: ADDRESS ONBOARDING                              -->
+    <!-- ========================================================= -->
+    <section id="screen-address" class="auth-screen screen-hidden" data-testid="screen-address">
+        <div class="auth-overlay"></div>
+        <div class="auth-card auth-card-wide" data-testid="address-card">
+            <div class="auth-header">
+                <span class="auth-badge">Step 2 of 2</span>
+                <h1 class="auth-title">Delivery Address</h1>
+                <p class="auth-subtitle">Where should our kitchen deliver your hot fresh pizza?</p>
+            </div>
+
+            <form id="address-form" data-testid="address-form" onsubmit="handleSaveAddress(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="addr-name">Full Name</label>
+                        <input type="text" id="addr-name" required placeholder="Alex Morgan" data-testid="addr-name-input" value="Alex Morgan">
+                    </div>
+                    <div class="form-group">
+                        <label for="addr-phone">Phone Number</label>
+                        <input type="tel" id="addr-phone" required placeholder="+1 (555) 234-5678" data-testid="addr-phone-input" value="+1 (555) 234-5678">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="addr-street">Street Address & Apartment</label>
+                    <input type="text" id="addr-street" required placeholder="742 Evergreen Terrace, Apt 4B" data-testid="addr-street-input" value="742 Evergreen Terrace, Apt 4B">
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="addr-city">City</label>
+                        <input type="text" id="addr-city" required placeholder="Springfield" data-testid="addr-city-input" value="Springfield">
+                    </div>
+                    <div class="form-group">
+                        <label for="addr-notes">Delivery Notes (Optional)</label>
+                        <input type="text" id="addr-notes" placeholder="Leave at door / ring buzzer" data-testid="addr-notes-input" value="Ring bell on arrival">
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline" onclick="navigateToScreen('login')" data-testid="addr-back-btn">
+                        ← Back to Login
+                    </button>
+                    <button type="submit" class="btn btn-primary" data-testid="save-address-btn">
+                        Save & View Menu →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- SCREEN 3: MAIN APPLICATION STORE                          -->
+    <!-- ========================================================= -->
+    <div id="screen-main" class="main-store screen-hidden" data-testid="screen-main">
+        <!-- Main background overlay -->
+        <div class="store-bg-overlay"></div>
+
+        <!-- ===== TOP NAVIGATION BAR ===== -->
+        <header class="navbar" data-testid="navbar">
+            <div class="container navbar-content">
+                <div class="brand-group" onclick="switchMainTab('menu')">
+                    <div class="brand-icon">🍕</div>
+                    <div>
+                        <span class="brand-name">Pizza Palace</span>
+                        <span class="brand-sub">Artisanal Hearth</span>
+                    </div>
+                </div>
+
+                <nav class="nav-links">
+                    <button class="nav-tab active" data-tab="menu" onclick="switchMainTab('menu')" data-testid="nav-menu-btn">
+                        🍕 Menu
+                    </button>
+                    <button class="nav-tab" data-tab="orders" onclick="switchMainTab('orders')" data-testid="nav-orders-btn">
+                        📦 My Orders
+                    </button>
+                    <button class="nav-tab" data-tab="support" onclick="switchMainTab('support')" data-testid="nav-support-btn">
+                        💬 Customer Support
+                    </button>
+                </nav>
+
+                <div class="nav-actions">
+                    <div class="user-pill" data-testid="user-pill" title="Click to manage address" onclick="navigateToScreen('address')">
+                        <span class="user-avatar">👤</span>
+                        <div class="user-meta">
+                            <span id="user-display-email" class="user-email">user@univ.edu</span>
+                            <span id="user-display-addr" class="user-address-preview">Address Set</span>
+                        </div>
+                    </div>
+
+                    <button class="cart-trigger-btn" data-testid="cart-toggle" onclick="toggleCartSidebar()">
+                        <span class="cart-icon">🛒</span>
+                        <span class="cart-label">Cart</span>
+                        <span id="cart-count" class="cart-badge" data-testid="cart-count">0</span>
+                    </button>
+
+                    <button class="btn-icon" title="Logout" onclick="handleLogout()" data-testid="logout-btn">
+                        🚪
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== STORE BODY WRAPPER ===== -->
+        <main class="container store-body">
+
+            <!-- TAB 1: MENU SECTION -->
+            <section id="tab-menu" class="store-tab tab-active" data-testid="menu-tab">
+                <!-- Hero Banner -->
+                <div class="hero-card">
+                    <div class="hero-content">
+                        <span class="hero-tag">Stone Baked Daily</span>
+                        <h2 class="hero-heading">Handcrafted Pizzas with Passion</h2>
+                        <p class="hero-sub">Fresh San Marzano tomatoes, artisanal cheeses, and 48-hour slow-fermented crust.</p>
+                        <div class="hero-badges">
+                            <span class="perk-badge">🚚 Fast Delivery</span>
+                            <span class="perk-badge">🔥 Fresh from Oven</span>
+                            <span class="perk-badge">🎟️ Use code <strong>WELCOME10</strong> for 10% off</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="category-bar" data-testid="category-filters">
+                    <div class="filter-pills">
+                        <button class="filter-pill active" data-category="all" onclick="filterMenu('all')">All Items</button>
+                        <button class="filter-pill" data-category="pizza" onclick="filterMenu('pizza')">🍕 Classic Pizzas</button>
+                        <button class="filter-pill" data-category="sides" onclick="filterMenu('sides')">🥖 Fresh Sides</button>
+                        <button class="filter-pill" data-category="drinks" onclick="filterMenu('drinks')">🥤 Chilled Drinks</button>
+                    </div>
+                    <span class="item-counter" id="item-counter">Showing 10 items</span>
+                </div>
+
+                <!-- Menu Items Grid -->
+                <div id="menu-grid" class="menu-grid" data-testid="menu-grid">
+                    <!-- Cards populated via app.js with real photography -->
+                </div>
+            </section>
+
+            <!-- TAB 2: MY ORDERS SECTION (STATUS TRACKING) -->
+            <section id="tab-orders" class="store-tab tab-hidden" data-testid="orders-tab">
+                <div class="section-card">
+                    <div class="section-card-header">
+                        <div>
+                            <h2 class="section-title">Order Status & History</h2>
+                            <p class="section-sub">Track active oven baking and view your previous orders in real time.</p>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="fetchUserOrders()" data-testid="refresh-orders-btn">
+                            🔄 Refresh Status
+                        </button>
+                    </div>
+
+                    <div id="orders-list" class="orders-list" data-testid="orders-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: CUSTOMER SUPPORT SECTION -->
+            <section id="tab-support" class="store-tab tab-hidden" data-testid="support-tab">
+                <div class="support-layout">
+                    <!-- Left: Quick Contact Channels -->
+                    <div class="support-info-card">
+                        <span class="auth-badge">24/7 Dedicated Care</span>
+                        <h2 class="section-title">We're Here to Help</h2>
+                        <p class="section-sub">Questions about your order, delivery time, or catering? Reach out directly to our team.</p>
+
+                        <div class="contact-channels">
+                            <a href="tel:+18005557499" class="channel-card" data-testid="support-call-link">
+                                <div class="channel-icon">📞</div>
+                                <div>
+                                    <div class="channel-title">Call Kitchen & Dispatch</div>
+                                    <div class="channel-value">+1 (800) 555-PIZZA</div>
+                                    <div class="channel-sub">Direct line • Available 10am - 12am</div>
+                                </div>
+                            </a>
+
+                            <a href="mailto:support@pizzapalace.com?subject=Pizza%20Order%20Inquiry" class="channel-card" data-testid="support-email-link">
+                                <div class="channel-icon">✉️</div>
+                                <div>
+                                    <div class="channel-title">Email Customer Support</div>
+                                    <div class="channel-value">support@pizzapalace.com</div>
+                                    <div class="channel-sub">Average response time: &lt; 15 mins</div>
+                                </div>
+                            </a>
+
+                            <div class="channel-card">
+                                <div class="channel-icon">📍</div>
+                                <div>
+                                    <div class="channel-title">Our Flagship Pizzeria</div>
+                                    <div class="channel-value">442 Artisan Way, Downtown</div>
+                                    <div class="channel-sub">Dine-in, Takeaway & Express Courier</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Support Contact Form -->
+                    <div class="support-form-card">
+                        <h3 class="card-heading">Send a Message</h3>
+                        <p class="card-sub">Submit an inquiry and our duty manager will respond immediately.</p>
+
+                        <form id="support-form" data-testid="support-form" onsubmit="handleSupportSubmit(event)">
+                            <div class="form-group">
+                                <label for="sup-name">Your Name</label>
+                                <input type="text" id="sup-name" required placeholder="Alex Morgan" data-testid="sup-name-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="sup-email">Your Email</label>
+                                <input type="email" id="sup-email" required placeholder="student@univ.edu" data-testid="sup-email-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="sup-subject">Inquiry Reason</label>
+                                <select id="sup-subject" required data-testid="sup-subject-select">
+                                    <option value="Order Tracking & Status">Order Tracking & Status</option>
+                                    <option value="Ingredients & Allergen Info">Ingredients & Allergen Info</option>
+                                    <option value="Delivery Delay Assistance">Delivery Delay Assistance</option>
+                                    <option value="Coupon or Payment Question">Coupon or Payment Question</option>
+                                    <option value="General Feedback">General Feedback</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="sup-message">Message Details</label>
+                                <textarea id="sup-message" rows="4" required placeholder="Please describe how we can assist you..." data-testid="sup-message-input"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block" data-testid="support-submit-btn">
+                                ✉️ Submit Support Inquiry
+                            </button>
+                        </form>
+
+                        <div id="support-success-box" class="support-success-box" style="display:none;" data-testid="support-success-box">
+                            <!-- Populated after submit -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ===== CART DRAWER ===== -->
+        <div id="cart-backdrop" class="cart-backdrop" onclick="toggleCartSidebar()"></div>
+        <aside id="cart-sidebar" class="cart-sidebar" data-testid="cart-sidebar">
+            <div class="cart-header">
+                <div>
+                    <h2 class="cart-title">Your Order Cart</h2>
+                    <span id="cart-item-count-label" class="cart-subtitle">0 items</span>
+                </div>
+                <button class="cart-close-btn" onclick="toggleCartSidebar()" data-testid="close-cart">✕</button>
+            </div>
+
+            <div id="cart-items" class="cart-items" data-testid="cart-items">
+                <!-- Cart items populated by app.js -->
+            </div>
+
+            <!-- Coupon Box -->
+            <div class="cart-coupon-box" data-testid="coupon-section">
+                <label for="coupon-input" class="coupon-label">Have a promo code?</label>
+                <div class="coupon-group">
+                    <input type="text" id="coupon-input" placeholder="e.g. WELCOME10" data-testid="coupon-input">
+                    <button class="btn btn-sm btn-accent" onclick="applyCoupon()" data-testid="apply-coupon-btn">Apply</button>
+                </div>
+                <p id="coupon-message" class="coupon-message" data-testid="coupon-message"></p>
+                <div class="quick-coupons">
+                    <span>Try: </span>
+                    <button type="button" class="tag-chip" onclick="quickApplyCoupon('WELCOME10')">WELCOME10</button>
+                    <button type="button" class="tag-chip" onclick="quickApplyCoupon('PIZZA20')">PIZZA20</button>
+                    <button type="button" class="tag-chip" onclick="quickApplyCoupon('STUDENT15')">STUDENT15</button>
+                </div>
+            </div>
+
+            <!-- Price Breakdown -->
+            <div class="cart-summary" data-testid="cart-totals">
+                <div class="summary-line">
+                    <span>Subtotal</span>
+                    <span id="subtotal" data-testid="subtotal">$0.00</span>
+                </div>
+                <div class="summary-line discount-line" id="discount-row" style="display:none;" data-testid="discount-row">
+                    <span>Discount Applied</span>
+                    <span id="discount-amount" data-testid="discount-amount">-$0.00</span>
+                </div>
+                <div class="summary-line delivery-line">
+                    <span>Delivery</span>
+                    <span class="free-pill">FREE</span>
+                </div>
+                <div class="summary-line total-line">
+                    <span>Total</span>
+                    <span id="final-total" data-testid="final-total">$0.00</span>
+                </div>
+            </div>
+
+            <div class="cart-actions">
+                <button id="checkout-btn" class="btn btn-primary btn-block" onclick="showCheckout()" disabled data-testid="checkout-btn">
+                    Proceed to Checkout →
+                </button>
+            </div>
+        </aside>
+
+        <!-- ===== CHECKOUT MODAL ===== -->
+        <div id="checkout-modal" class="modal-overlay" style="display:none;" data-testid="checkout-modal">
+            <div class="modal checkout-modal-card" data-testid="checkout-form-container">
+                <button class="modal-close-btn" onclick="hideCheckout()" data-testid="close-checkout">✕</button>
+                
+                <div class="modal-header">
+                    <span class="auth-badge">Final Step</span>
+                    <h2 class="modal-title">Confirm Delivery & Place Order</h2>
+                    <p class="modal-subtitle">Review your delivery address and order items.</p>
+                </div>
+
+                <form id="checkout-form" data-testid="checkout-form" onsubmit="placeOrder(event)">
+                    <div class="checkout-grid">
+                        <div class="checkout-left">
+                            <h3 class="form-section-title">Delivery Details</h3>
+                            <div class="form-group">
+                                <label for="customer-name">Full Name</label>
+                                <input type="text" id="customer-name" required data-testid="input-name">
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-phone">Contact Phone</label>
+                                <input type="tel" id="customer-phone" required data-testid="input-phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-address">Delivery Address</label>
+                                <textarea id="customer-address" rows="3" required data-testid="input-address"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="checkout-right">
+                            <h3 class="form-section-title">Order Summary</h3>
+                            <div id="checkout-summary" class="checkout-summary-box">
+                                <!-- Populated dynamically -->
+                            </div>
+                            <div class="checkout-total-banner">
+                                <span>Total Amount:</span>
+                                <strong id="checkout-total-price" data-testid="checkout-total-price">$0.00</strong>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block checkout-submit-btn" data-testid="place-order-btn">
+                                🍕 Confirm & Place Order
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== ORDER CONFIRMATION MODAL ===== -->
+        <div id="confirmation-modal" class="modal-overlay" style="display:none;" data-testid="confirmation-modal">
+            <div class="modal confirmation-modal-card">
+                <div class="celebrate-icon">🎉</div>
+                <h2 class="modal-title">Order Placed Successfully!</h2>
+                <p class="modal-subtitle">Our chefs have received your order and started preparing your meal.</p>
+
+                <div id="confirmation-details" class="confirmation-details" data-testid="confirmation-details">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div class="confirmation-actions">
+                    <button class="btn btn-primary" onclick="viewMyOrdersAfterConfirmation()" data-testid="track-order-btn">
+                        📦 Track in My Orders
+                    </button>
+                    <button class="btn btn-outline" onclick="resetApp()" data-testid="new-order-btn">
+                        🍕 Order More Food
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

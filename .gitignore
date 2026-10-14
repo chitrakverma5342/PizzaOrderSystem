@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Database
+*.db
+
+# Coverage (Phase 2+)
+coverage/
+
+# Test results
+test-results/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
